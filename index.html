@@ -1,52 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>破音字注音小遊戲</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <main class="app">
-    <section class="card">
-      <div class="top-bar">
-        <div>
-          <h1>破音字注音小遊戲</h1>
-          <p>上傳題庫後開始遊戲</p>
-        </div>
 
-        <div class="score-box">
-          <span>積分</span>
-          <strong id="score">0</strong>
-        </div>
+  <div class="container">
+
+    <div class="top-bar">
+
+      <div>
+        <h1>破音字注音小遊戲</h1>
+        <p>上傳題庫開始遊戲</p>
       </div>
 
-      <div class="upload-box">
-        <input type="file" id="fileInput" accept=".csv" />
+      <div class="score-box">
+        <div class="score-label">積分</div>
+        <div id="score">0</div>
       </div>
 
-      <div class="status-row">
-        <span id="modeLabel">尚未載入題庫</span>
-        <span id="wrongCount">錯題：0</span>
+    </div>
+
+    <div class="upload-box">
+      <input type="file" id="fileInput" accept=".csv">
+    </div>
+
+    <div class="status-row">
+
+      <div id="modeLabel">
+        尚未載入題庫
       </div>
 
-      <div class="question-box">
-        <div id="sentence" class="sentence">請先上傳題庫</div>
-
-        <div class="ask">
-          「<span id="targetWord">?</span>」怎麼念？
-        </div>
+      <div id="wrongCount">
+        錯題：0
       </div>
 
-      <div class="options" id="options"></div>
+    </div>
 
-      <div class="feedback" id="feedback"></div>
+    <div class="question-box">
 
-      <button id="nextBtn" class="next-btn">下一題</button>
-      <button id="wrongPracticeBtn" class="wrong-btn hidden">練習錯題</button>
-    </section>
-  </main>
+      <div id="sentence" class="sentence">
+        請先上傳題庫
+      </div>
+
+      <div class="question-text">
+        「<span id="targetWord">?</span>」怎麼念？
+      </div>
+
+    </div>
+
+    <div id="options" class="options"></div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <button id="nextBtn" class="next-btn">
+      下一題
+    </button>
+
+    <button id="wrongPracticeBtn" class="wrong-btn hidden">
+      練習錯題
+    </button>
+
+  </div>
 
   <script src="script.js"></script>
+
 </body>
 </html>
