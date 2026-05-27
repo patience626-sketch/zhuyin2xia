@@ -1,7 +1,9 @@
 let questions = [];
+
 let score = 0;
 let currentQuestion = null;
 let answered = false;
+
 let wrongQuestions = [];
 let wrongPracticeMode = false;
 
@@ -19,27 +21,32 @@ const modeLabelEl = document.getElementById("modeLabel");
 fileInput.addEventListener("change", handleFileUpload);
 
 function handleFileUpload(event) {
+
   const file = event.target.files[0];
 
   if (!file) return;
 
   const reader = new FileReader();
 
-  reader.onload = function (e) {
+  reader.onload = function(e) {
+
     const csvText = e.target.result;
+
     questions = parseCSV(csvText);
 
     if (questions.length === 0) {
-      feedbackEl.textContent = "題庫讀取失敗，請檢查 CSV 格式。";
+      feedbackEl.textContent = "題庫讀取失敗";
       return;
     }
 
     score = 0;
     wrongQuestions = [];
     wrongPracticeMode = false;
+
     scoreEl.textContent = score;
 
-    feedbackEl.textContent = "題庫載入成功，開始練習！";
+    feedbackEl.textContent = "題庫載入成功！";
+
     pickQuestion();
   };
 
@@ -47,47 +54,58 @@ function handleFileUpload(event) {
 }
 
 function parseCSV(csvText) {
+
   const lines = csvText.trim().split(/\r?\n/);
+
   const dataLines = lines.slice(1);
 
-  return dataLines
-    .map(line => parseCSVLine(line))
-    .filter(cols => cols.length >= 5)
-    .map(cols => {
-      return {
-        sentence: parseSentence(cols[0]),
-        word: cols[1].trim(),
-        options: cols[2].split("|").map(item => item.trim()),
-        answer: cols[3].trim(),
-        explanation: cols[4].trim()
-      };
-    });
+  return dataLines.map(line => {
+
+    const cols = parseCSVLine(line);
+
+    return {
+      sentence: parseSentence(cols[0]),
+      word: cols[1],
+      options: cols[2].split("|"),
+      answer: cols[3],
+      explanation: cols[4]
+    };
+
+  });
 }
 
 function parseCSVLine(line) {
+
   const result = [];
+
   let current = "";
   let insideQuotes = false;
 
   for (let i = 0; i < line.length; i++) {
+
     const char = line[i];
 
     if (char === '"') {
       insideQuotes = !insideQuotes;
-    } else if (char === "," && !insideQuotes) {
+    }
+    else if (char === "," && !insideQuotes) {
       result.push(current);
       current = "";
-    } else {
+    }
+    else {
       current += char;
     }
   }
 
   result.push(current);
+
   return result;
 }
 
 function parseSentence(text) {
+
   return text.split(" ").map(part => {
+
     const match = part.match(/^(.+?)\((.+?)\)$/);
 
     if (match) {
@@ -105,50 +123,71 @@ function parseSentence(text) {
 }
 
 function pickQuestion() {
-  if (questions.length === 0) {
-    feedbackEl.textContent = "請先上傳題庫。";
-    return;
-  }
 
-  const pool = wrongPracticeMode && wrongQuestions.length > 0
-    ? wrongQuestions
-    : questions;
+  if (questions.length === 0) return;
 
-  const randomIndex = Math.floor(Math.random() * pool.length);
+  const pool =
+    wrongPracticeMode && wrongQuestions.length > 0
+      ? wrongQuestions
+      : questions;
+
+  const randomIndex =
+    Math.floor(Math.random() * pool.length);
+
   currentQuestion = pool[randomIndex];
+
   answered = false;
 
   renderQuestion();
 }
 
 function renderQuestion() {
+
   sentenceEl.innerHTML = "";
 
   currentQuestion.sentence.forEach(item => {
+
     const span = document.createElement("span");
+
     span.className = "char-block";
 
     if (item.char === currentQuestion.word) {
-      span.innerHTML = `<span class="target-char">${item.char}</span>`;
-    } else if (item.zhuyin) {
-      span.innerHTML = `<ruby>${item.char}<rt>${item.zhuyin}</rt></ruby>`;
-    } else {
-      span.textContent = item.char;
+
+      span.innerHTML = `
+        <span class="target-char">${item.char}</span>
+      `;
+    }
+    else {
+
+      span.innerHTML = `
+        <span class="main-char">${item.char}</span>
+        <span class="zhuyin">${item.zhuyin}</span>
+      `;
     }
 
     sentenceEl.appendChild(span);
   });
 
   targetWordEl.textContent = currentQuestion.word;
+
   optionsEl.innerHTML = "";
+
   feedbackEl.textContent = "";
+
   feedbackEl.className = "feedback";
 
   currentQuestion.options.forEach(option => {
+
     const button = document.createElement("button");
+
     button.className = "option-btn";
+
     button.textContent = option;
-    button.addEventListener("click", () => checkAnswer(option, button));
+
+    button.addEventListener("click", () => {
+      checkAnswer(option, button);
+    });
+
     optionsEl.appendChild(button);
   });
 
@@ -156,12 +195,16 @@ function renderQuestion() {
 }
 
 function checkAnswer(selectedOption, selectedButton) {
+
   if (answered) return;
+
   answered = true;
 
-  const buttons = document.querySelectorAll(".option-btn");
+  const buttons =
+    document.querySelectorAll(".option-btn");
 
   buttons.forEach(button => {
+
     button.disabled = true;
 
     if (button.textContent === currentQuestion.answer) {
@@ -170,20 +213,33 @@ function checkAnswer(selectedOption, selectedButton) {
   });
 
   if (selectedOption === currentQuestion.answer) {
+
     score += 10;
+
     scoreEl.textContent = score;
 
     feedbackEl.className = "feedback good";
-    feedbackEl.innerHTML = `太棒了！答對了！<br>${currentQuestion.explanation}`;
+
+    feedbackEl.innerHTML = `
+      太棒了！答對了！<br>
+      ${currentQuestion.explanation}
+    `;
 
     if (wrongPracticeMode) {
       removeFromWrongQuestions(currentQuestion);
     }
+
   } else {
+
     selectedButton.classList.add("wrong");
 
     feedbackEl.className = "feedback bad";
-    feedbackEl.innerHTML = `差一點！正確答案是 <strong>${currentQuestion.answer}</strong><br>${currentQuestion.explanation}`;
+
+    feedbackEl.innerHTML = `
+      答錯了！<br>
+      正確答案是 ${currentQuestion.answer}<br>
+      ${currentQuestion.explanation}
+    `;
 
     addToWrongQuestions(currentQuestion);
   }
@@ -192,9 +248,10 @@ function checkAnswer(selectedOption, selectedButton) {
 }
 
 function addToWrongQuestions(question) {
+
   const exists = wrongQuestions.some(q =>
-    JSON.stringify(q.sentence) === JSON.stringify(question.sentence) &&
-    q.word === question.word
+    q.word === question.word &&
+    JSON.stringify(q.sentence) === JSON.stringify(question.sentence)
   );
 
   if (!exists) {
@@ -203,31 +260,43 @@ function addToWrongQuestions(question) {
 }
 
 function removeFromWrongQuestions(question) {
+
   wrongQuestions = wrongQuestions.filter(q =>
     !(
-      JSON.stringify(q.sentence) === JSON.stringify(question.sentence) &&
-      q.word === question.word
+      q.word === question.word &&
+      JSON.stringify(q.sentence) === JSON.stringify(question.sentence)
     )
   );
 
   if (wrongQuestions.length === 0) {
+
     wrongPracticeMode = false;
-    feedbackEl.innerHTML += "<br>錯題都練完了，回到一般練習！";
+
+    feedbackEl.innerHTML += `
+      <br>錯題全部完成！
+    `;
   }
 }
 
 function updateStatus() {
+
   if (questions.length === 0) {
     modeLabelEl.textContent = "尚未載入題庫";
-  } else {
-    modeLabelEl.textContent = wrongPracticeMode ? "錯題練習中" : "一般練習";
+  }
+  else {
+    modeLabelEl.textContent =
+      wrongPracticeMode
+        ? "錯題練習模式"
+        : "一般練習";
   }
 
-  wrongCountEl.textContent = `錯題：${wrongQuestions.length}`;
+  wrongCountEl.textContent =
+    `錯題：${wrongQuestions.length}`;
 
   if (wrongQuestions.length > 0) {
     wrongPracticeBtn.classList.remove("hidden");
-  } else {
+  }
+  else {
     wrongPracticeBtn.classList.add("hidden");
   }
 }
@@ -237,7 +306,10 @@ nextBtn.addEventListener("click", () => {
 });
 
 wrongPracticeBtn.addEventListener("click", () => {
+
   if (wrongQuestions.length === 0) return;
+
   wrongPracticeMode = true;
+
   pickQuestion();
 });
