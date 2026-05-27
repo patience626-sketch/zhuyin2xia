@@ -445,6 +445,9 @@
     let wrongQuestions = [];
     let wrongPracticeMode = false;
 
+    let shuffledQuestions = [];
+    let currentIndex = 0;
+
     const fileInput = document.getElementById("fileInput");
     const scoreEl = document.getElementById("score");
     const sentenceEl = document.getElementById("sentence");
@@ -461,7 +464,7 @@
 
     async function loadDefaultCSV() {
       try {
-        const response = await fetch("questions.csv");
+        const response = await fetch("questions.csv?v=" + Date.now());
 
         if (!response.ok) {
           feedbackEl.textContent = "請上傳 CSV 題庫。";
@@ -499,6 +502,9 @@
       score = 0;
       wrongQuestions = [];
       wrongPracticeMode = false;
+      shuffledQuestions = [];
+      currentIndex = 0;
+
       scoreEl.textContent = score;
       feedbackEl.textContent = message;
 
@@ -646,6 +652,17 @@
       return html;
     }
 
+    function shuffleArray(array) {
+      const copied = [...array];
+
+      for (let i = copied.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copied[i], copied[j]] = [copied[j], copied[i]];
+      }
+
+      return copied;
+    }
+
     function pickQuestion() {
       if (questions.length === 0) return;
 
@@ -654,7 +671,17 @@
           ? wrongQuestions
           : questions;
 
-      currentQuestion = pool[Math.floor(Math.random() * pool.length)];
+      if (
+        shuffledQuestions.length === 0 ||
+        currentIndex >= shuffledQuestions.length
+      ) {
+        shuffledQuestions = shuffleArray(pool);
+        currentIndex = 0;
+      }
+
+      currentQuestion = shuffledQuestions[currentIndex];
+      currentIndex++;
+
       answered = false;
       renderQuestion();
     }
@@ -767,6 +794,8 @@
 
       if (wrongQuestions.length === 0) {
         wrongPracticeMode = false;
+        shuffledQuestions = [];
+        currentIndex = 0;
       }
     }
 
@@ -787,7 +816,11 @@
 
     wrongPracticeBtn.addEventListener("click", () => {
       if (wrongQuestions.length === 0) return;
+
       wrongPracticeMode = true;
+      shuffledQuestions = [];
+      currentIndex = 0;
+
       pickQuestion();
     });
   </script>
