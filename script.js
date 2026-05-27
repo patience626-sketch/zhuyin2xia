@@ -1,14 +1,17 @@
 let questions = [];
-
 let score = 0;
-
 let currentQuestion = null;
-
 let answered = false;
 
 let wrongQuestions = [];
-
 let wrongPracticeMode = false;
+
+/* ===== 新增：隨機不重複 ===== */
+
+let shuffledQuestions = [];
+let currentIndex = 0;
+
+/* ========================= */
 
 const fileInput =
   document.getElementById("fileInput");
@@ -106,7 +109,7 @@ function loadQuestionsFromCSV(csvText, message) {
   if (questions.length === 0) {
 
     feedbackEl.textContent =
-      "題庫格式錯誤";
+      "題庫格式錯誤，請檢查 questions.csv。";
 
     return;
   }
@@ -116,6 +119,13 @@ function loadQuestionsFromCSV(csvText, message) {
   wrongQuestions = [];
 
   wrongPracticeMode = false;
+
+  /* ===== 新增 ===== */
+
+  shuffledQuestions = [];
+  currentIndex = 0;
+
+  /* ============== */
 
   scoreEl.textContent = score;
 
@@ -131,15 +141,12 @@ function parseCSV(csvText) {
 
   const dataLines = lines.slice(1);
 
-  return dataLines.map(line => {
-
-    const cols =
-      parseCSVLine(line);
-
-    return {
-
+  return dataLines
+    .map(line => parseCSVLine(line))
+    .filter(cols => cols.length >= 5)
+    .map(cols => ({
       sentence:
-        parseSentence(cols[0]),
+        parseSentence(cols[0].trim()),
 
       word:
         cols[1].trim(),
@@ -154,8 +161,7 @@ function parseCSV(csvText) {
 
       explanation:
         cols[4].trim()
-    };
-  });
+    }));
 }
 
 function parseCSVLine(line) {
@@ -204,17 +210,13 @@ function parseSentence(text) {
     if (match) {
 
       return {
-
         char: match[1],
-
         zhuyin: match[2]
       };
     }
 
     return {
-
       char: part,
-
       zhuyin: ""
     };
   });
@@ -223,25 +225,24 @@ function parseSentence(text) {
 function splitZhuyin(zhuyin) {
 
   let tone = "";
-
   let toneClass = "";
 
   if (zhuyin.includes("ˊ")) {
 
     tone = "ˊ";
     toneClass = "tone2";
-  }
-  else if (zhuyin.includes("ˇ")) {
+
+  } else if (zhuyin.includes("ˇ")) {
 
     tone = "ˇ";
     toneClass = "tone3";
-  }
-  else if (zhuyin.includes("ˋ")) {
+
+  } else if (zhuyin.includes("ˋ")) {
 
     tone = "ˋ";
     toneClass = "tone4";
-  }
-  else if (zhuyin.includes("˙")) {
+
+  } else if (zhuyin.includes("˙")) {
 
     tone = "˙";
     toneClass = "tone5";
@@ -250,38 +251,54 @@ function splitZhuyin(zhuyin) {
   const body =
     zhuyin.replace(/[ˊˇˋ˙]/g, "");
 
+  const letters =
+    Array.from(body);
+
   return {
 
-    body,
+    letters,
     tone,
-    toneClass
+    toneClass,
+    lengthClass:
+      "len" + letters.length
   };
 }
 
 function createZhuyinHTML(zhuyin) {
 
+  if (!zhuyin) return "";
+
   const parts =
     splitZhuyin(zhuyin);
 
-  return `
-    <div class="zhuyin-wrap">
-
+  let html = `
+    <div class="zhuyin-column ${parts.lengthClass}">
       <div class="zhuyin-body">
-        ${parts.body}
-      </div>
-
-      ${
-        parts.tone
-          ? `
-            <div class="zhuyin-tone ${parts.toneClass}">
-              ${parts.tone}
-            </div>
-          `
-          : ""
-      }
-
-    </div>
   `;
+
+  parts.letters.forEach(letter => {
+
+    html += `
+      <div class="zhuyin-letter">
+        ${letter}
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  if (parts.tone) {
+
+    html += `
+      <div class="tone-mark ${parts.toneClass}">
+        ${parts.tone}
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+
+  return html;
 }
 
 function createOptionZhuyinHTML(zhuyin) {
@@ -289,25 +306,60 @@ function createOptionZhuyinHTML(zhuyin) {
   const parts =
     splitZhuyin(zhuyin);
 
-  return `
-    <div class="option-zhuyin">
-
+  let html = `
+    <div class="option-zhuyin-box ${parts.lengthClass}">
       <div class="option-body">
-        ${parts.body}
-      </div>
-
-      ${
-        parts.tone
-          ? `
-            <div class="option-tone ${parts.toneClass}">
-              ${parts.tone}
-            </div>
-          `
-          : ""
-      }
-
-    </div>
   `;
+
+  parts.letters.forEach(letter => {
+
+    html += `
+      <div class="option-letter">
+        ${letter}
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  if (parts.tone) {
+
+    html += `
+      <div class="option-tone ${parts.toneClass}">
+        ${parts.tone}
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+
+  return html;
+}
+
+/* ===================================== */
+/* ===== 這裡是新的隨機不重複功能 ===== */
+/* ===================================== */
+
+function shuffleArray(array) {
+
+  const copied = [...array];
+
+  for (
+    let i = copied.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() * (i + 1)
+      );
+
+    [copied[i], copied[j]] =
+      [copied[j], copied[i]];
+  }
+
+  return copied;
 }
 
 function pickQuestion() {
@@ -323,19 +375,28 @@ function pickQuestion() {
 
       : questions;
 
-  const randomIndex =
+  if (
+    shuffledQuestions.length === 0 ||
+    currentIndex >= shuffledQuestions.length
+  ) {
 
-    Math.floor(
-      Math.random() * pool.length
-    );
+    shuffledQuestions =
+      shuffleArray(pool);
+
+    currentIndex = 0;
+  }
 
   currentQuestion =
-    pool[randomIndex];
+    shuffledQuestions[currentIndex];
+
+  currentIndex++;
 
   answered = false;
 
   renderQuestion();
 }
+
+/* ===================================== */
 
 function renderQuestion() {
 
@@ -346,13 +407,13 @@ function renderQuestion() {
     const span =
       document.createElement("span");
 
-    span.className =
-      "char-block";
-
     if (
       item.char ===
       currentQuestion.word
     ) {
+
+      span.className =
+        "char-block no-zhuyin";
 
       span.innerHTML = `
         <div class="target-char">
@@ -360,7 +421,10 @@ function renderQuestion() {
         </div>
       `;
 
-    } else {
+    } else if (item.zhuyin) {
+
+      span.className =
+        "char-block";
 
       span.innerHTML = `
         <div class="main-char">
@@ -368,6 +432,17 @@ function renderQuestion() {
         </div>
 
         ${createZhuyinHTML(item.zhuyin)}
+      `;
+
+    } else {
+
+      span.className =
+        "char-block no-zhuyin";
+
+      span.innerHTML = `
+        <div class="main-char">
+          ${item.char}
+        </div>
       `;
     }
 
@@ -419,7 +494,6 @@ function checkAnswer(
   answered = true;
 
   const buttons =
-
     document.querySelectorAll(
       ".option-btn"
     );
@@ -559,6 +633,9 @@ wrongPracticeBtn.addEventListener(
     ) return;
 
     wrongPracticeMode = true;
+
+    shuffledQuestions = [];
+    currentIndex = 0;
 
     pickQuestion();
   }
