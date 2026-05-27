@@ -6,7 +6,7 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  background: linear-gradient(135deg, #ffe7ba, #ffd6e7, #d9ecff);
+  background: linear-gradient(135deg, #ffe8b8, #ffd6e7, #d9ecff);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,11 +15,11 @@ body {
 
 .app {
   width: 100%;
-  max-width: 760px;
+  max-width: 820px;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   border-radius: 32px;
   padding: 32px;
   box-shadow: 0 20px 50px rgba(80, 60, 120, 0.22);
@@ -68,10 +68,38 @@ p {
   color: #f4a000;
 }
 
+.upload-box {
+  margin-top: 28px;
+  background: #f7f4ff;
+  border-radius: 24px;
+  padding: 18px;
+  border: 2px dashed #b9a9ff;
+}
+
+.upload-box label {
+  display: inline-block;
+  background: #7c6cff;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.upload-box input {
+  margin-left: 12px;
+}
+
+.upload-box small {
+  display: block;
+  margin-top: 10px;
+  color: #666;
+}
+
 .status-row {
   display: flex;
   justify-content: space-between;
-  margin: 28px 0 20px;
+  margin: 24px 0 18px;
   font-size: 17px;
   color: #666;
 }
@@ -86,19 +114,46 @@ p {
   background: #f7fbff;
   border: 3px dashed #9bd0ff;
   border-radius: 28px;
-  padding: 28px;
+  padding: 30px 20px;
   text-align: center;
 }
 
 .sentence {
-  font-size: 32px;
-  line-height: 1.5;
+  font-size: 38px;
+  line-height: 2.1;
   color: #263238;
-  font-weight: 700;
+  font-weight: 800;
+  min-height: 100px;
+}
+
+.char-block {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+ruby {
+  ruby-position: over;
+}
+
+rt {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #5f6f89;
+  font-weight: 600;
+}
+
+.target-char {
+  color: #ff4f8b;
+  background: #fff0f6;
+  border: 3px solid #ff9fc4;
+  border-radius: 18px;
+  padding: 2px 8px;
 }
 
 .ask {
-  margin-top: 16px;
+  margin-top: 20px;
   font-size: 24px;
   color: #5c5c5c;
 }
@@ -203,24 +258,20 @@ p {
     align-items: stretch;
   }
 
-  h1 {
-    font-size: 28px;
-    text-align: center;
-  }
-
+  h1,
   .top-bar p {
     text-align: center;
   }
 
   .sentence {
-    font-size: 26px;
-  }
-
-  .ask {
-    font-size: 21px;
+    font-size: 31px;
   }
 
   .options {
     grid-template-columns: 1fr;
+  }
+
+  .char-block {
+    margin: 0 6px;
   }
 }
