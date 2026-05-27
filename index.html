@@ -12,22 +12,31 @@
       <div class="top-bar">
         <div>
           <h1>破音字注音小遊戲</h1>
-          <p>選出句子中正確的注音讀法！</p>
+          <p>上傳題庫，選出正確讀音！</p>
         </div>
+
         <div class="score-box">
           <span>積分</span>
           <strong id="score">0</strong>
         </div>
       </div>
 
+      <div class="upload-box">
+        <label for="fileInput">上傳 CSV 題庫</label>
+        <input type="file" id="fileInput" accept=".csv" />
+        <small>題庫格式：sentence, word, options, answer, explanation</small>
+      </div>
+
       <div class="status-row">
-        <span id="modeLabel">一般練習</span>
+        <span id="modeLabel">尚未載入題庫</span>
         <span id="wrongCount">錯題：0</span>
       </div>
 
       <div class="question-box">
-        <p class="sentence" id="sentence"></p>
-        <p class="ask">「<span id="targetWord"></span>」在這裡怎麼念？</p>
+        <div class="sentence" id="sentence">
+          請先上傳題庫
+        </div>
+        <p class="ask">「<span id="targetWord">?</span>」在這裡怎麼念？</p>
       </div>
 
       <div class="options" id="options"></div>
@@ -35,7 +44,7 @@
       <div class="feedback" id="feedback"></div>
 
       <button class="next-btn" id="nextBtn">下一題</button>
-      <button class="wrong-btn" id="wrongPracticeBtn">練習錯題</button>
+      <button class="wrong-btn hidden" id="wrongPracticeBtn">練習錯題</button>
     </section>
   </main>
 
