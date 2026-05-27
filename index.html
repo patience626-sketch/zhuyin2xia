@@ -22,7 +22,7 @@
 
     .container {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1100px;
       background: white;
       border-radius: 28px;
       padding: 32px;
@@ -38,7 +38,7 @@
 
     h1 {
       margin: 0;
-      font-size: 40px;
+      font-size: 42px;
       color: #222;
       font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
     }
@@ -104,112 +104,112 @@
     }
 
     .sentence {
-      min-height: 150px;
-      line-height: 1.9;
-      text-align: left;
+      min-height: 160px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-start;
-      gap: 10px 2px;
+      row-gap: 28px;
+      column-gap: 2px;
+      line-height: 1;
     }
 
     .char-block {
-      position: relative;
-      display: inline-block;
-      width: 54px;
-      height: 72px;
-      margin: 0 2px;
-      vertical-align: top;
+      display: inline-grid;
+      grid-template-columns: 48px 26px;
+      column-gap: 7px;
+      width: 81px;
+      height: 78px;
+      align-items: center;
+      justify-items: center;
+    }
+
+    .char-block.no-zhuyin {
+      grid-template-columns: 48px;
+      width: 52px;
+    }
+
+    .main-char,
+    .target-char {
+      font-size: 44px;
+      line-height: 1;
+      font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
+      text-align: center;
     }
 
     .main-char {
-      position: absolute;
-      left: 0;
-      top: 10px;
-      width: 40px;
-      height: 56px;
-      font-size: 42px;
-      line-height: 1;
       color: #111;
-      font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
-      text-align: center;
     }
 
     .target-char {
-      position: absolute;
-      left: 0;
-      top: 6px;
-      width: 42px;
-      height: 58px;
-      font-size: 44px;
-      line-height: 1.1;
       color: #e53935;
-      font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
-      text-align: center;
     }
 
     .zhuyin-column {
-      position: absolute;
-      left: 40px;
-      top: 7px;
-      width: 14px;
-      height: 58px;
-      font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
+      position: relative;
+      width: 26px;
+      height: 62px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .zhuyin-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1px;
+      height: 54px;
     }
 
     .zhuyin-letter {
-      position: absolute;
-      left: 0;
-      width: 14px;
-      height: 14px;
-      font-size: 13px;
-      line-height: 14px;
+      width: 18px;
+      height: 16px;
+      font-size: 15px;
+      line-height: 16px;
       text-align: center;
-      color: #222;
-    }
-
-    .z-pos-1 {
-      top: 0;
-    }
-
-    .z-pos-2 {
-      top: 15px;
-    }
-
-    .z-pos-3 {
-      top: 30px;
+      color: #111;
+      font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
     }
 
     .tone-mark {
       position: absolute;
-      left: 13px;
+      left: 18px;
       width: 12px;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1;
-      color: #222;
+      color: #111;
       text-align: center;
+      font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
     }
 
-    .tone2 {
-      top: 2px;
+    .zhuyin-column.len1 .tone2,
+    .zhuyin-column.len2 .tone2,
+    .zhuyin-column.len3 .tone2 {
+      top: 7px;
     }
 
-    .tone3 {
-      top: 18px;
+    .zhuyin-column.len1 .tone3,
+    .zhuyin-column.len2 .tone3,
+    .zhuyin-column.len3 .tone3 {
+      top: 24px;
     }
 
-    .tone4 {
-      top: 34px;
+    .zhuyin-column.len1 .tone4,
+    .zhuyin-column.len2 .tone4,
+    .zhuyin-column.len3 .tone4 {
+      top: 40px;
     }
 
-    .tone5 {
-      top: -8px;
-      left: 2px;
+    .zhuyin-column .tone5 {
+      top: -2px;
+      left: 5px;
     }
 
     .question-text {
-      margin-top: 22px;
+      margin-top: 24px;
       font-size: 32px;
       color: #333;
       text-align: center;
@@ -243,59 +243,58 @@
 
     .option-zhuyin-box {
       position: relative;
-      display: inline-block;
-      width: 56px;
-      height: 80px;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 70px;
+      height: 88px;
+    }
+
+    .option-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2px;
+      height: 78px;
     }
 
     .option-letter {
-      position: absolute;
-      left: 12px;
-      width: 30px;
-      height: 24px;
+      width: 34px;
+      height: 26px;
       font-size: 32px;
-      line-height: 24px;
+      line-height: 26px;
       text-align: center;
       color: #111;
       font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
     }
 
-    .option-pos-1 {
-      top: 0;
-    }
-
-    .option-pos-2 {
-      top: 26px;
-    }
-
-    .option-pos-3 {
-      top: 52px;
-    }
-
     .option-tone {
       position: absolute;
-      left: 44px;
-      width: 20px;
+      left: 52px;
+      width: 18px;
       font-size: 24px;
       color: #111;
       line-height: 1;
+      font-family: "DFKai-SB", "BiauKai", "標楷體", serif;
     }
 
-    .option-tone.tone2 {
-      top: 4px;
+    .option-zhuyin-box .tone2 {
+      top: 8px;
     }
 
-    .option-tone.tone3 {
-      top: 28px;
+    .option-zhuyin-box .tone3 {
+      top: 32px;
     }
 
-    .option-tone.tone4 {
-      top: 52px;
+    .option-zhuyin-box .tone4 {
+      top: 56px;
     }
 
-    .option-tone.tone5 {
-      top: -10px;
-      left: 20px;
+    .option-zhuyin-box .tone5 {
+      top: -4px;
+      left: 26px;
     }
 
     .correct {
@@ -374,8 +373,14 @@
       }
 
       .char-block {
-        width: 48px;
-        height: 66px;
+        grid-template-columns: 40px 24px;
+        width: 71px;
+        height: 70px;
+        column-gap: 7px;
+      }
+
+      .char-block.no-zhuyin {
+        width: 44px;
       }
 
       .main-char,
@@ -383,8 +388,8 @@
         font-size: 36px;
       }
 
-      .zhuyin-column {
-        left: 35px;
+      .zhuyin-letter {
+        font-size: 13px;
       }
 
       .options {
@@ -580,22 +585,26 @@
       return {
         letters,
         tone,
-        toneClass
+        toneClass,
+        lengthClass: "len" + letters.length
       };
     }
 
     function createZhuyinHTML(zhuyin) {
+      if (!zhuyin) return "";
+
       const parts = splitZhuyin(zhuyin);
 
-      let html = `<div class="zhuyin-column">`;
+      let html = `
+        <div class="zhuyin-column ${parts.lengthClass}">
+          <div class="zhuyin-body">
+      `;
 
-      parts.letters.forEach((letter, index) => {
-        html += `
-          <div class="zhuyin-letter z-pos-${index + 1}">
-            ${letter}
-          </div>
-        `;
+      parts.letters.forEach(letter => {
+        html += `<div class="zhuyin-letter">${letter}</div>`;
       });
+
+      html += `</div>`;
 
       if (parts.tone) {
         html += `
@@ -613,15 +622,16 @@
     function createOptionZhuyinHTML(zhuyin) {
       const parts = splitZhuyin(zhuyin);
 
-      let html = `<div class="option-zhuyin-box">`;
+      let html = `
+        <div class="option-zhuyin-box ${parts.lengthClass}">
+          <div class="option-body">
+      `;
 
-      parts.letters.forEach((letter, index) => {
-        html += `
-          <div class="option-letter option-pos-${index + 1}">
-            ${letter}
-          </div>
-        `;
+      parts.letters.forEach(letter => {
+        html += `<div class="option-letter">${letter}</div>`;
       });
+
+      html += `</div>`;
 
       if (parts.tone) {
         html += `
@@ -654,16 +664,22 @@
 
       currentQuestion.sentence.forEach(item => {
         const span = document.createElement("span");
-        span.className = "char-block";
 
         if (item.char === currentQuestion.word) {
+          span.className = "char-block no-zhuyin";
           span.innerHTML = `
             <div class="target-char">${item.char}</div>
           `;
-        } else {
+        } else if (item.zhuyin) {
+          span.className = "char-block";
           span.innerHTML = `
             <div class="main-char">${item.char}</div>
             ${createZhuyinHTML(item.zhuyin)}
+          `;
+        } else {
+          span.className = "char-block no-zhuyin";
+          span.innerHTML = `
+            <div class="main-char">${item.char}</div>
           `;
         }
 
