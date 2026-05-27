@@ -1,82 +1,11 @@
-const questions = [
-  {
-    sentence: "我喜歡聽音樂。",
-    word: "樂",
-    options: ["ㄌㄜˋ", "ㄩㄝˋ"],
-    answer: "ㄩㄝˋ",
-    explanation: "「音樂」的「樂」讀作 ㄩㄝˋ。"
-  },
-  {
-    sentence: "今天我覺得很快樂。",
-    word: "樂",
-    options: ["ㄌㄜˋ", "ㄩㄝˋ"],
-    answer: "ㄌㄜˋ",
-    explanation: "「快樂」的「樂」讀作 ㄌㄜˋ。"
-  },
-  {
-    sentence: "哥哥已經長大了。",
-    word: "長",
-    options: ["ㄔㄤˊ", "ㄓㄤˇ"],
-    answer: "ㄓㄤˇ",
-    explanation: "「長大」的「長」讀作 ㄓㄤˇ。"
-  },
-  {
-    sentence: "這條繩子很長。",
-    word: "長",
-    options: ["ㄔㄤˊ", "ㄓㄤˇ"],
-    answer: "ㄔㄤˊ",
-    explanation: "表示長度時，「長」讀作 ㄔㄤˊ。"
-  },
-  {
-    sentence: "這件事很重要。",
-    word: "重",
-    options: ["ㄓㄨㄥˋ", "ㄔㄨㄥˊ"],
-    answer: "ㄓㄨㄥˋ",
-    explanation: "「重要」的「重」讀作 ㄓㄨㄥˋ。"
-  },
-  {
-    sentence: "請你重複說一次。",
-    word: "重",
-    options: ["ㄓㄨㄥˋ", "ㄔㄨㄥˊ"],
-    answer: "ㄔㄨㄥˊ",
-    explanation: "「重複」的「重」讀作 ㄔㄨㄥˊ。"
-  },
-  {
-    sentence: "爸爸在銀行工作。",
-    word: "行",
-    options: ["ㄒㄧㄥˊ", "ㄏㄤˊ"],
-    answer: "ㄏㄤˊ",
-    explanation: "「銀行」的「行」讀作 ㄏㄤˊ。"
-  },
-  {
-    sentence: "我們一起行走在人行道上。",
-    word: "行",
-    options: ["ㄒㄧㄥˊ", "ㄏㄤˊ"],
-    answer: "ㄒㄧㄥˊ",
-    explanation: "表示走路、可以時，「行」常讀作 ㄒㄧㄥˊ。"
-  },
-  {
-    sentence: "他是一個好孩子。",
-    word: "好",
-    options: ["ㄏㄠˇ", "ㄏㄠˋ"],
-    answer: "ㄏㄠˇ",
-    explanation: "表示良好時，「好」讀作 ㄏㄠˇ。"
-  },
-  {
-    sentence: "他很好學，每天都看書。",
-    word: "好",
-    options: ["ㄏㄠˇ", "ㄏㄠˋ"],
-    answer: "ㄏㄠˋ",
-    explanation: "表示喜愛、喜歡時，「好」讀作 ㄏㄠˋ。"
-  }
-];
-
+let questions = [];
 let score = 0;
 let currentQuestion = null;
 let answered = false;
 let wrongQuestions = [];
 let wrongPracticeMode = false;
 
+const fileInput = document.getElementById("fileInput");
 const scoreEl = document.getElementById("score");
 const sentenceEl = document.getElementById("sentence");
 const targetWordEl = document.getElementById("targetWord");
@@ -87,7 +16,100 @@ const wrongPracticeBtn = document.getElementById("wrongPracticeBtn");
 const wrongCountEl = document.getElementById("wrongCount");
 const modeLabelEl = document.getElementById("modeLabel");
 
+fileInput.addEventListener("change", handleFileUpload);
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    const csvText = e.target.result;
+    questions = parseCSV(csvText);
+
+    if (questions.length === 0) {
+      feedbackEl.textContent = "題庫讀取失敗，請檢查 CSV 格式。";
+      return;
+    }
+
+    score = 0;
+    wrongQuestions = [];
+    wrongPracticeMode = false;
+    scoreEl.textContent = score;
+
+    feedbackEl.textContent = "題庫載入成功，開始練習！";
+    pickQuestion();
+  };
+
+  reader.readAsText(file, "UTF-8");
+}
+
+function parseCSV(csvText) {
+  const lines = csvText.trim().split(/\r?\n/);
+  const dataLines = lines.slice(1);
+
+  return dataLines
+    .map(line => parseCSVLine(line))
+    .filter(cols => cols.length >= 5)
+    .map(cols => {
+      return {
+        sentence: parseSentence(cols[0]),
+        word: cols[1].trim(),
+        options: cols[2].split("|").map(item => item.trim()),
+        answer: cols[3].trim(),
+        explanation: cols[4].trim()
+      };
+    });
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === "," && !insideQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
+function parseSentence(text) {
+  return text.split(" ").map(part => {
+    const match = part.match(/^(.+?)\((.+?)\)$/);
+
+    if (match) {
+      return {
+        char: match[1],
+        zhuyin: match[2]
+      };
+    }
+
+    return {
+      char: part,
+      zhuyin: ""
+    };
+  });
+}
+
 function pickQuestion() {
+  if (questions.length === 0) {
+    feedbackEl.textContent = "請先上傳題庫。";
+    return;
+  }
+
   const pool = wrongPracticeMode && wrongQuestions.length > 0
     ? wrongQuestions
     : questions;
@@ -100,7 +122,23 @@ function pickQuestion() {
 }
 
 function renderQuestion() {
-  sentenceEl.textContent = currentQuestion.sentence;
+  sentenceEl.innerHTML = "";
+
+  currentQuestion.sentence.forEach(item => {
+    const span = document.createElement("span");
+    span.className = "char-block";
+
+    if (item.char === currentQuestion.word) {
+      span.innerHTML = `<span class="target-char">${item.char}</span>`;
+    } else if (item.zhuyin) {
+      span.innerHTML = `<ruby>${item.char}<rt>${item.zhuyin}</rt></ruby>`;
+    } else {
+      span.textContent = item.char;
+    }
+
+    sentenceEl.appendChild(span);
+  });
+
   targetWordEl.textContent = currentQuestion.word;
   optionsEl.innerHTML = "";
   feedbackEl.textContent = "";
@@ -155,7 +193,8 @@ function checkAnswer(selectedOption, selectedButton) {
 
 function addToWrongQuestions(question) {
   const exists = wrongQuestions.some(q =>
-    q.sentence === question.sentence && q.word === question.word
+    JSON.stringify(q.sentence) === JSON.stringify(question.sentence) &&
+    q.word === question.word
   );
 
   if (!exists) {
@@ -165,7 +204,10 @@ function addToWrongQuestions(question) {
 
 function removeFromWrongQuestions(question) {
   wrongQuestions = wrongQuestions.filter(q =>
-    !(q.sentence === question.sentence && q.word === question.word)
+    !(
+      JSON.stringify(q.sentence) === JSON.stringify(question.sentence) &&
+      q.word === question.word
+    )
   );
 
   if (wrongQuestions.length === 0) {
@@ -175,8 +217,13 @@ function removeFromWrongQuestions(question) {
 }
 
 function updateStatus() {
+  if (questions.length === 0) {
+    modeLabelEl.textContent = "尚未載入題庫";
+  } else {
+    modeLabelEl.textContent = wrongPracticeMode ? "錯題練習中" : "一般練習";
+  }
+
   wrongCountEl.textContent = `錯題：${wrongQuestions.length}`;
-  modeLabelEl.textContent = wrongPracticeMode ? "錯題練習中" : "一般練習";
 
   if (wrongQuestions.length > 0) {
     wrongPracticeBtn.classList.remove("hidden");
@@ -194,5 +241,3 @@ wrongPracticeBtn.addEventListener("click", () => {
   wrongPracticeMode = true;
   pickQuestion();
 });
-
-pickQuestion();
