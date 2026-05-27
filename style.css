@@ -6,7 +6,7 @@ body {
   margin: 0;
   padding: 24px;
   min-height: 100vh;
-  font-family: "Noto Sans TC", sans-serif;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
   background: linear-gradient(135deg, #ffe8b8, #ffd6e7, #d9ecff);
   display: flex;
   justify-content: center;
@@ -15,14 +15,14 @@ body {
 
 .app {
   width: 100%;
-  max-width: 850px;
+  max-width: 900px;
 }
 
 .card {
-  background: rgba(255,255,255,0.92);
+  background: rgba(255, 255, 255, 0.94);
   border-radius: 36px;
   padding: 32px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
 }
 
 .top-bar {
@@ -64,6 +64,10 @@ h1 {
 
 .upload-box {
   margin-top: 24px;
+  background: #f7f4ff;
+  border: 3px dashed #b9a9ff;
+  border-radius: 24px;
+  padding: 20px;
 }
 
 .upload-box input {
@@ -94,35 +98,71 @@ h1 {
 }
 
 .sentence {
-  min-height: 120px;
+  min-height: 130px;
+  line-height: 1.8;
 }
 
 .char-block {
   display: inline-flex;
   flex-direction: row-reverse;
   align-items: flex-start;
-  margin: 0 10px;
+  margin: 0 9px 18px;
+  vertical-align: top;
 }
 
 .main-char {
-  font-size: 56px;
+  font-size: 54px;
   font-weight: 900;
   color: #263238;
   line-height: 1;
 }
 
-.zhuyin {
+.zhuyin-wrap {
+  position: relative;
+  width: 22px;
+  height: 58px;
+  margin-left: 3px;
+}
+
+.zhuyin-body {
   writing-mode: vertical-rl;
   text-orientation: upright;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1;
-  margin-left: 3px;
   color: #5c6f89;
+  font-weight: 700;
+  position: absolute;
+  top: 2px;
+  right: 4px;
+}
+
+.zhuyin-tone {
+  position: absolute;
+  right: -7px;
+  color: #5c6f89;
+  font-size: 14px;
   font-weight: 700;
 }
 
+.zhuyin-tone.tone2 {
+  top: 4px;
+}
+
+.zhuyin-tone.tone3 {
+  top: 18px;
+}
+
+.zhuyin-tone.tone4 {
+  top: 31px;
+}
+
+.zhuyin-tone.tone5 {
+  top: -8px;
+  right: 2px;
+}
+
 .target-char {
-  font-size: 56px;
+  font-size: 54px;
   font-weight: 900;
   color: #ff4f8b;
   background: #fff0f6;
@@ -226,7 +266,6 @@ h1 {
 }
 
 @media (max-width: 768px) {
-
   .card {
     padding: 24px;
   }
@@ -250,8 +289,16 @@ h1 {
     font-size: 42px;
   }
 
-  .zhuyin {
-    font-size: 14px;
+  .zhuyin-wrap {
+    height: 48px;
+  }
+
+  .zhuyin-body {
+    font-size: 13px;
+  }
+
+  .zhuyin-tone {
+    font-size: 12px;
   }
 
   .ask {
