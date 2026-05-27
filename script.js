@@ -34,6 +34,7 @@ async function loadDefaultCSV() {
     }
 
     const csvText = await response.text();
+
     loadQuestionsFromCSV(csvText, "預設題庫載入成功！");
   } catch (error) {
     feedbackEl.textContent = "請上傳 CSV 題庫。";
@@ -110,6 +111,7 @@ function parseCSVLine(line) {
   }
 
   result.push(current);
+
   return result;
 }
 
@@ -131,6 +133,52 @@ function parseSentence(text) {
   });
 }
 
+function splitZhuyin(zhuyin) {
+  let tone = "";
+  let toneClass = "";
+
+  if (zhuyin.includes("ˊ")) {
+    tone = "ˊ";
+    toneClass = "tone2";
+  } else if (zhuyin.includes("ˇ")) {
+    tone = "ˇ";
+    toneClass = "tone3";
+  } else if (zhuyin.includes("ˋ")) {
+    tone = "ˋ";
+    toneClass = "tone4";
+  } else if (zhuyin.includes("˙")) {
+    tone = "˙";
+    toneClass = "tone5";
+  }
+
+  const body = zhuyin.replace(/[ˊˇˋ˙]/g, "");
+
+  return {
+    body,
+    tone,
+    toneClass
+  };
+}
+
+function createZhuyinHTML(zhuyin) {
+  const parts = splitZhuyin(zhuyin);
+
+  if (!parts.body && !parts.tone) {
+    return "";
+  }
+
+  return `
+    <span class="zhuyin-wrap">
+      <span class="zhuyin-body">${parts.body}</span>
+      ${
+        parts.tone
+          ? `<span class="zhuyin-tone ${parts.toneClass}">${parts.tone}</span>`
+          : ""
+      }
+    </span>
+  `;
+}
+
 function pickQuestion() {
   if (questions.length === 0) {
     feedbackEl.textContent = "請先上傳題庫。";
@@ -143,6 +191,7 @@ function pickQuestion() {
       : questions;
 
   const randomIndex = Math.floor(Math.random() * pool.length);
+
   currentQuestion = pool[randomIndex];
   answered = false;
 
@@ -163,7 +212,7 @@ function renderQuestion() {
     } else {
       span.innerHTML = `
         <span class="main-char">${item.char}</span>
-        <span class="zhuyin">${item.zhuyin}</span>
+        ${createZhuyinHTML(item.zhuyin)}
       `;
     }
 
@@ -171,12 +220,14 @@ function renderQuestion() {
   });
 
   targetWordEl.textContent = currentQuestion.word;
+
   optionsEl.innerHTML = "";
   feedbackEl.textContent = "";
   feedbackEl.className = "feedback";
 
   currentQuestion.options.forEach(option => {
     const button = document.createElement("button");
+
     button.className = "option-btn";
     button.textContent = option;
 
@@ -255,7 +306,10 @@ function removeFromWrongQuestions(question) {
 
   if (wrongQuestions.length === 0) {
     wrongPracticeMode = false;
-    feedbackEl.innerHTML += `<br>錯題全部完成！`;
+
+    feedbackEl.innerHTML += `
+      <br>錯題全部完成！
+    `;
   }
 }
 
@@ -284,5 +338,6 @@ wrongPracticeBtn.addEventListener("click", () => {
   if (wrongQuestions.length === 0) return;
 
   wrongPracticeMode = true;
+
   pickQuestion();
 });
